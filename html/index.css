@@ -562,17 +562,10 @@ input[type="radio"].svelte-imelgj.svelte-imelgj {
   text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.7), 1px -1px 0 rgba(0, 0, 0, 0.7),
     -1px 1px 0 rgba(0, 0, 0, 0.7), 1px 1px 0 rgba(0, 0, 0, 0.7);
 }
-.vehicle-number.svelte-1goqjlo {
-  font-size: 2.4vh;
-  color: #fff;
-  font-weight: 600;
-  text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.7), 1px -1px 0 rgba(0, 0, 0, 0.7),
-    -1px 1px 0 rgba(0, 0, 0, 0.7), 1px 1px 0 rgba(0, 0, 0, 0.7);
-}
-.vehicle-text.svelte-1goqjlo {
-  font-weight: 900;
-  text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.7), 1px -1px 0 rgba(0, 0, 0, 0.7),
-    -1px 1px 0 rgba(0, 0, 0, 0.7), 1px 1px 0 rgba(0, 0, 0, 0.7);
+.vehicle-number.svelte-1goqjlo,
+.vehicle-text.svelte-1goqjlo,
+.car-hud-box.svelte-ruer6w {
+  display: none !important;
 }
 @media (min-width: 800px) {
   .vehicle-number.svelte-1goqjlo {
