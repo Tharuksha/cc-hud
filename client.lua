@@ -1,6 +1,8 @@
 -- CC SCRIPTS / HUD
 
-local QBCore = exports['qb-core']:GetCoreObject()
+local coreName = GetResourceState('qbx-core') ~= 'missing' and 'qbx-core' or 'qb-core'
+local QBCore = exports[coreName]:GetCoreObject()
+math.randomseed(GetGameTimer())
 local serverId = GetPlayerServerId(PlayerId())
 local PlayerData = QBCore.Functions.GetPlayerData()
 local config = Config
@@ -8,8 +10,9 @@ local UIConfig = UIConfig
 local speedMultiplier = config.UseMPH and 2.23694 or 3.6
 local seatbeltOn = false
 local cruiseOn = false
-local showAltitude = false
-local showSeatbelt = false
+-- remove vehicle hud specific variables
+local showAltitude = false -- deprecated
+local showSeatbelt = false -- deprecated
 local next = next
 local nos = 0
 local stress = 0
@@ -28,11 +31,18 @@ local dev = false
 local admin = false
 local playerDead = false
 local showMenu = false
-local showCircleB = false
+-- minimap border states (circle border removed)
 local showSquareB = false
 local CinematicHeight = 0.2
 local w = 0
 local radioTalking = false
+
+local function IsPlayerLoggedIn()
+    if LocalPlayer.state ~= nil and LocalPlayer.state.isLoggedIn ~= nil then
+        return LocalPlayer.state.isLoggedIn
+    end
+    return PlayerData and PlayerData.citizenid ~= nil
+end
 local Menu = {
     isOutMapChecked = true, -- isOutMapChecked
     isOutCompassChecked = true, -- isOutCompassChecked
@@ -53,7 +63,6 @@ local Menu = {
     isPointerShowChecked = true, -- isPointerShowChecked
     isDegreesShowChecked = true, -- isDegreesShowChecked
     isCineamticModeChecked = false, -- isCineamticModeChecked
-    isToggleMapShapeChecked = 'square', -- isToggleMapShapeChecked
 }
 
 DisplayRadar(false)
@@ -80,7 +89,8 @@ local function hasHarness()
     if not IsPedInAnyVehicle(ped, false) then return end
 
     local _harness = false
-    local hasHarness = exports['qb-smallresources']:HasHarness()
+    local smallRes = GetResourceState('qbx-smallresources') ~= 'missing' and 'qbx-smallresources' or 'qb-smallresources'
+    local hasHarness = exports[smallRes]:HasHarness()
     if hasHarness then
         _harness = true
     else
@@ -410,80 +420,32 @@ RegisterNetEvent("hud:client:LoadMap", function()
     if aspectRatio > defaultAspectRatio then
         minimapOffset = ((defaultAspectRatio-aspectRatio)/3.6)-0.008
     end
-    if Menu.isToggleMapShapeChecked == "square" then
-        RequestStreamedTextureDict("squaremap", false)
-        if not HasStreamedTextureDictLoaded("squaremap") then
-            Wait(150)
-        end
-        if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.load_square_map"))
-        end
-        SetMinimapClipType(0)
-        AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "squaremap", "radarmasksm")
-        AddReplaceTexture("platform:/textures/graphics", "radarmask1g", "squaremap", "radarmasksm")
-        -- 0.0 = nav symbol and icons left
-        -- 0.1638 = nav symbol and icons stretched
-        -- 0.216 = nav symbol and icons raised up
-        SetMinimapComponentPosition("minimap", "L", "B", 0.0 + minimapOffset, -0.047, 0.1638, 0.183)
+    RequestStreamedTextureDict("squaremap", false)
+    if not HasStreamedTextureDictLoaded("squaremap") then
+        Wait(150)
+    end
+    if Menu.isMapNotifChecked then
+        QBCore.Functions.Notify(Lang:t("notify.load_square_map"))
+    end
+    SetMinimapClipType(0)
+    AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "squaremap", "radarmasksm")
+    AddReplaceTexture("platform:/textures/graphics", "radarmask1g", "squaremap", "radarmasksm")
+    SetMinimapComponentPosition("minimap", "L", "B", 0.0 + minimapOffset, -0.047, 0.1638, 0.183)
 
-        -- icons within map
-        SetMinimapComponentPosition("minimap_mask", "L", "B", 0.0 + minimapOffset, 0.0, 0.128, 0.20)
+    SetMinimapComponentPosition("minimap_mask", "L", "B", 0.0 + minimapOffset, 0.0, 0.128, 0.20)
 
-        -- -0.01 = map pulled left
-        -- 0.025 = map raised up
-        -- 0.262 = map stretched
-        -- 0.315 = map shorten
-        SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.01 + minimapOffset, 0.025, 0.262, 0.300)
-        SetBlipAlpha(GetNorthRadarBlip(), 0)
-        SetRadarBigmapEnabled(true, false)
-        SetMinimapClipType(0)
-        Wait(50)
-        SetRadarBigmapEnabled(false, false)
-        if Menu.isToggleMapBordersChecked then
-            showCircleB = false
-            showSquareB = true
-        end
-        Wait(1200)
-        if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.loaded_square_map"))
-        end
-    elseif Menu.isToggleMapShapeChecked == "circle" then
-        RequestStreamedTextureDict("circlemap", false)
-        if not HasStreamedTextureDictLoaded("circlemap") then
-            Wait(150)
-        end
-        if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.load_circle_map"))
-        end
-        SetMinimapClipType(1)
-        AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "circlemap", "radarmasksm")
-        AddReplaceTexture("platform:/textures/graphics", "radarmask1g", "circlemap", "radarmasksm")
-        -- -0.0100 = nav symbol and icons left
-        -- 0.180 = nav symbol and icons stretched
-        -- 0.258 = nav symbol and icons raised up
-        SetMinimapComponentPosition("minimap", "L", "B", -0.0100 + minimapOffset, -0.030, 0.180, 0.258)
-
-        -- icons within map
-        SetMinimapComponentPosition("minimap_mask", "L", "B", 0.200 + minimapOffset, 0.0, 0.065, 0.20)
-
-        -- -0.00 = map pulled left
-        -- 0.015 = map raised up
-        -- 0.252 = map stretched
-        -- 0.338 = map shorten
-        SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.00 + minimapOffset, 0.015, 0.252, 0.338)
-        SetBlipAlpha(GetNorthRadarBlip(), 0)
-        SetMinimapClipType(1)
-        SetRadarBigmapEnabled(true, false)
-        Wait(50)
-        SetRadarBigmapEnabled(false, false)
-        if Menu.isToggleMapBordersChecked then
-            showSquareB = false
-            showCircleB = true
-        end
-        Wait(1200)
-        if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.loaded_circle_map"))
-        end
+    SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.01 + minimapOffset, 0.025, 0.262, 0.300)
+    SetBlipAlpha(GetNorthRadarBlip(), 0)
+    SetRadarBigmapEnabled(true, false)
+    SetMinimapClipType(0)
+    Wait(50)
+    SetRadarBigmapEnabled(false, false)
+    if Menu.isToggleMapBordersChecked then
+        showSquareB = true
+    end
+    Wait(1200)
+    if Menu.isMapNotifChecked then
+        QBCore.Functions.Notify(Lang:t("notify.loaded_square_map"))
     end
 end)
 
@@ -493,16 +455,6 @@ RegisterNuiCallback('GetImage', function(_, cb)
     cb(Config.Image)
 end)
 
-RegisterNUICallback('ToggleMapShape', function(data, cb)
-    cb({})
-    Wait(50)
-    if Menu.isMapEnabledChecked then
-        Menu.isToggleMapShapeChecked = data.shape
-        Wait(50)
-        TriggerEvent("hud:client:LoadMap")
-    end
-    TriggerEvent("hud:client:playHudChecklistSound")
-end)
 
 RegisterNUICallback('ToggleMapBorders', function(data, cb)
     cb({})
@@ -514,14 +466,9 @@ RegisterNUICallback('ToggleMapBorders', function(data, cb)
     end
 
     if Menu.isToggleMapBordersChecked then
-        if Menu.isToggleMapShapeChecked == "square" then
-            showSquareB = true
-        else
-            showCircleB = true
-        end
+        showSquareB = true
     else
         showSquareB = false
-        showCircleB = false
     end
     TriggerEvent("hud:client:playHudChecklistSound")
 end)
@@ -615,7 +562,6 @@ RegisterNUICallback('updateMenuSettingsToClient', function(data, cb)
     Menu.isLowFuelChecked = data.isLowFuelAlertChecked
     Menu.isCinematicNotifChecked = data.isCinematicNotifyChecked
     Menu.isMapEnabledChecked = data.isMapEnabledChecked
-    Menu.isToggleMapShapeChecked = data.isToggleMapShapeChecked
     Menu.isToggleMapBordersChecked = data.isToggleMapBordersChecked
     Menu.isCompassShowChecked = data.isShowCompassChecked
     Menu.isShowStreetsChecked = data.isShowStreetsChecked
@@ -822,74 +768,14 @@ local function updatePlayerHud(data)
     end
 end
 
-local prevVehicleStats = {
-    nil, --[1] show,
-    nil, --[2] isPaused,
-    nil, --[3] seatbelt
-    nil, --[4] speed
-    nil, --[5] fuel
-    nil, --[6] altitude
-    nil, --[7] showAltitude
-    nil, --[8] showSeatbelt
-    nil, --[9] showSquareBorder
-    nil --[10] showCircleBorder
-}
 
-local function updateShowVehicleHud(show)
-    if prevVehicleStats[1] ~= show then
-        prevVehicleStats[1] = show
-        prevVehicleStats[3] = false
-        SendNUIMessage({
-            action = 'car',
-            topic = 'display',
-            show = false,
-            seatbelt = false,
-        })
-    end
-end
-
-local function updateVehicleHud(data)
-    local shouldUpdate = false
-    for k, v in pairs(data) do
-        if prevVehicleStats[k] ~= v then shouldUpdate = true break end
-    end
-    prevVehicleStats = data
-    if shouldUpdate then
-        SendNUIMessage({
-            action = 'car',
-            topic = 'status',
-            show = data[1],
-            isPaused = data[2],
-            seatbelt = data[3],
-            speed = data[4],
-            fuel = data[5],
-            altitude = data[6],
-            showAltitude = data[7],
-            showSeatbelt = data[8],
-            showSquareB = data[9],
-            showCircleB = data[10],
-        })
-    end
-end
-
-local lastFuelUpdate = 0
-local lastFuelCheck = {}
-
-local function getFuelLevel(vehicle)
-    local updateTick = GetGameTimer()
-    if (updateTick - lastFuelUpdate) > 2000 then
-        lastFuelUpdate = updateTick
-        lastFuelCheck = math.floor(exports[Config.FuelScript]:GetFuel(vehicle))
-    end
-    return lastFuelCheck
-end
 
 -- HUD Update loop
 
 CreateThread(function()
     local wasInVehicle = false
     while true do        
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             Wait(500)
 
             local show = true
@@ -1005,26 +891,11 @@ CreateThread(function()
                     dev,
                 })
 
-                updateVehicleHud({
-                    show,
-                    IsPauseMenuActive(),
-                    seatbeltOn,
-                    math.ceil(GetEntitySpeed(vehicle) * speedMultiplier),
-                    getFuelLevel(vehicle),
-                    math.ceil(GetEntityCoords(player).z * 0.5),
-                    showAltitude,
-                    showSeatbelt,
-                    showSquareB,
-                    showCircleB,
-                })
                 showAltitude = false
                 showSeatbelt = true
             else
                 if wasInVehicle then
                     wasInVehicle = false
-                    updateShowVehicleHud(false)
-                    prevVehicleStats[1] = false
-                    prevVehicleStats[3] = false
                     seatbeltOn = false
                     cruiseOn = false
                     harness = false
@@ -1032,9 +903,8 @@ CreateThread(function()
                 DisplayRadar(not Menu.isOutMapChecked)
             end
         else
-            -- Not logged in, dont show Status/Vehicle UI (cached)
+            -- Not logged in, dont show Status UI (cached)
             updateShowPlayerHud(false)
-            updateShowVehicleHud(false)
             DisplayRadar(false)
             Wait(1000)
         end
@@ -1054,7 +924,7 @@ end
 -- Low fuel
 CreateThread(function()
     while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             local ped = PlayerPedId()
             if IsPedInAnyVehicle(ped, false) and not IsThisModelABicycle(GetEntityModel(GetVehiclePedIsIn(ped, false))) and not isElectric(GetVehiclePedIsIn(ped, false)) then
                 if exports[Config.FuelScript]:GetFuel(GetVehiclePedIsIn(ped, false)) <= 20 then -- At 20% Fuel Left
@@ -1124,7 +994,7 @@ end)
 
 CreateThread(function() -- Speeding
     while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             local ped = PlayerPedId()
             if IsPedInAnyVehicle(ped, false) then
                 local speed = GetEntitySpeed(GetVehiclePedIsIn(ped, false)) * speedMultiplier
@@ -1151,7 +1021,7 @@ end
 
 CreateThread(function() -- Shooting
     while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             local ped = PlayerPedId()
             local weapon = GetSelectedPedWeapon(ped)
             if weapon ~= `WEAPON_UNARMED` then
@@ -1194,7 +1064,7 @@ end
 
 CreateThread(function()
     while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             local ped = PlayerPedId()
             local effectInterval = GetEffectInterval(stress)
             if stress >= 100 then
@@ -1313,7 +1183,7 @@ CreateThread(function()
     local lastIsOutCompassCheck = Menu.isOutCompassChecked
     local lastInVehicle = false
 	while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             Wait(400)
             local show = true
             local player = PlayerPedId()
