@@ -24,8 +24,6 @@ type menuStatus = {
   isResetSoundsChecked: boolean,
   isShowCompassChecked: boolean,
   isShowStreetsChecked: boolean,
-  isToggleMapBordersChecked: boolean, 
-  isToggleMapShapeChecked: "circle" | "square"
 }
 
 const store = () => {
@@ -62,8 +60,6 @@ const store = () => {
       isResetSoundsChecked: getLocalStorage("isResetSoundsChecked", true),
       isShowCompassChecked: getLocalStorage("isShowCompassChecked", true),
       isShowStreetsChecked: getLocalStorage("isShowStreetsChecked", true),
-      isToggleMapBordersChecked: getLocalStorage("isToggleMapBordersChecked", true), 
-      isToggleMapShapeChecked: getLocalStorage("isToggleMapShapeChecked", "circle"),
     }
   }
 
@@ -147,9 +143,7 @@ const store = () => {
           "isMapNotifyChecked": state.isMapNotifyChecked,
           "isLowFuelAlertChecked": state.isLowFuelAlertChecked,
           "isCinematicNotifyChecked": state.isCinematicNotifyChecked,
-          "isToggleMapShapeChecked": state.isToggleMapShapeChecked,
           "isMapEnabledChecked": state.isMapEnabledChecked,
-          "isToggleMapBordersChecked": state.isToggleMapBordersChecked,
           "isShowCompassChecked": state.isShowCompassChecked,
           "isShowStreetsChecked": state.isShowStreetsChecked,
           "isPointerShowChecked": state.isPointerShowChecked,

@@ -6,7 +6,6 @@ import MoneyHudStore from '../stores/moneyHudStore';
 import PlayerHudStore from '../stores/playerStatusHudStore';
 import ExternalStatusStore from "../stores/externalStatusStore";
 import LayoutStore from '../stores/layoutStore';
-import VehicleHudStore from '../stores/vehicleHudStore';
 import ColorEffectStore from '../stores/colorEffectStore';
 import ProfileStore from '../stores/profileStore';
 import { colorStoreLocalStorageName,
@@ -37,16 +36,6 @@ export function EventHandler() {
           case "closecompass":
             CompassHudStore.receiveCompassCloseMessage(event.data as any);
             break;
-        }
-        break;
-      case "car":
-        switch (event.data.topic) {
-          case "display":
-            VehicleHudStore.receiveShowMessage(event.data as any);
-            break;
-          case "status":
-            VehicleHudStore.receiveUpdateMessage(event.data as any);
-          break;
         }
         break;
       case "externalstatus":

@@ -6,10 +6,8 @@
   import Menu from "./components/menu/menu.svelte";
   import DebugStore from './stores/debugStore';
   import PlayerHudStore from './stores/playerStatusHudStore';
-  import MapBorder from "./components/organisms/map-border-hud.svelte";
   import CompassHud from './components/organisms/compass-hud.svelte';
   import MoneyHud from './components/organisms/money-hud.svelte';
-  import VehicleHud from './components/organisms/vehicle-hud.svelte';
 
   EventHandler();
 
@@ -53,8 +51,7 @@
     <CompassHud />
     <MoneyHud />
     <MetaLayout />
-    <VehicleHud />
-    <MapBorder />
+    
   {/if}
   <Menu />
 </main>

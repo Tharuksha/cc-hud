@@ -1,6 +1,7 @@
 -- CC SCRIPTS / HUD
 
-local QBCore = exports['qb-core']:GetCoreObject()
+local coreName = GetResourceState('qbx-core') ~= 'missing' and 'qbx-core' or 'qb-core'
+local QBCore = exports[coreName]:GetCoreObject()
 local ResetStress = false
 
 QBCore.Commands.Add('cash', Lang:t('info.check_cash_balance'), {}, false, function(source, args)
