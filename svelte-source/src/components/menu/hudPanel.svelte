@@ -1,18 +1,11 @@
 <script lang="ts">
   import Button from '../atoms/button.svelte'
   import Checkbox from '../atoms/checkbox.svelte'
-  import Switch from '../atoms/switch.svelte'
   import MenuStore from '../../stores/menuStore';
   import { fetchNui } from '../../utils/eventHandler';
   import PlayerHudStore from '../../stores/playerStatusHudStore';
   import { onMount } from 'svelte';
   let img: string;
-
-  function handleIsToggleMapShapeChecked(checked: boolean) {
-    let shape: "circle" | "square" = checked ? "circle": "square";
-    $MenuStore.isToggleMapShapeChecked = shape;
-    fetchNui("ToggleMapShape", {shape: shape})
-  }
 
   onMount(async () => {
     // Set the toggle map shape to the current setting
@@ -152,18 +145,8 @@
     <p>Vehicle</p>
   </div>
   <div class="mx-4 mb-4 flex flex-col">
-    <Switch checked={$MenuStore.isToggleMapShapeChecked == "circle"} checkedText="Minimap Circle" unCheckedText="Minimap Square"
-      handleUpdateFunction={(checked) => handleIsToggleMapShapeChecked(checked)}
-    />
-    <p class="font-semibold text-base pb-2">
-      Whether it's square or circle you desire, you have the ability to choose!
-    </p>
-
     <Checkbox bind:checked={$MenuStore.isMapEnabledChecked}
       primaryText={"Minimap Enabled"} handleUpdateFunction={(checked) => fetchNui("HideMap", {checked})}
-    />
-    <Checkbox bind:checked={$MenuStore.isToggleMapBordersChecked}
-      primaryText={"Minimap Borders Enabled"} handleUpdateFunction={(checked) => fetchNui("ToggleMapBorders", {checked})}
     />
     <Checkbox bind:checked={$PlayerHudStore.dynamicIcons.engine}
       primaryText={"Show Engine Always"}

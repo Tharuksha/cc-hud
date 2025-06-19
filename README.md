@@ -13,7 +13,7 @@
 * ... and all features from ps-hud/qb-hud
 
 ## Dependencies
-* Only QBCore is required
+* QBCore or Qbox (qbx-core) is required
 
 ## Optional:
 * [ps-buffs](https://github.com/Project-Sloth/ps-buffs)
