@@ -1,6 +1,7 @@
 -- CC SCRIPTS / HUD
 
-local QBCore = exports['qb-core']:GetCoreObject()
+local coreName = GetResourceState('qbx-core') ~= 'missing' and 'qbx-core' or 'qb-core'
+local QBCore = exports[coreName]:GetCoreObject()
 local serverId = GetPlayerServerId(PlayerId())
 local PlayerData = QBCore.Functions.GetPlayerData()
 local config = Config
@@ -80,7 +81,8 @@ local function hasHarness()
     if not IsPedInAnyVehicle(ped, false) then return end
 
     local _harness = false
-    local hasHarness = exports['qb-smallresources']:HasHarness()
+    local smallRes = GetResourceState('qbx-smallresources') ~= 'missing' and 'qbx-smallresources' or 'qb-smallresources'
+    local hasHarness = exports[smallRes]:HasHarness()
     if hasHarness then
         _harness = true
     else
