@@ -6,11 +6,12 @@ description 'CC HUD Script'
 version '1.0.1'
 
 shared_scripts {
-	'@qb-core/shared/locale.lua',
-	'locales/en.lua',
-	'locales/*.lua',
-	'config.lua',
-	'uiconfig.lua'
+    '@qb-core/shared/locale.lua',
+    '@qbx-core/shared/locale.lua',
+    'locales/en.lua',
+    'locales/*.lua',
+    'config.lua',
+    'uiconfig.lua'
 }
 
 client_script 'client.lua'
