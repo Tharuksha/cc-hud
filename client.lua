@@ -2,6 +2,7 @@
 
 local coreName = GetResourceState('qbx-core') ~= 'missing' and 'qbx-core' or 'qb-core'
 local QBCore = exports[coreName]:GetCoreObject()
+math.randomseed(GetGameTimer())
 local serverId = GetPlayerServerId(PlayerId())
 local PlayerData = QBCore.Functions.GetPlayerData()
 local config = Config
@@ -35,6 +36,13 @@ local showSquareB = false
 local CinematicHeight = 0.2
 local w = 0
 local radioTalking = false
+
+local function IsPlayerLoggedIn()
+    if LocalPlayer.state ~= nil and LocalPlayer.state.isLoggedIn ~= nil then
+        return LocalPlayer.state.isLoggedIn
+    end
+    return PlayerData and PlayerData.citizenid ~= nil
+end
 local Menu = {
     isOutMapChecked = true, -- isOutMapChecked
     isOutCompassChecked = true, -- isOutCompassChecked
@@ -767,7 +775,7 @@ end
 CreateThread(function()
     local wasInVehicle = false
     while true do        
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             Wait(500)
 
             local show = true
@@ -916,7 +924,7 @@ end
 -- Low fuel
 CreateThread(function()
     while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             local ped = PlayerPedId()
             if IsPedInAnyVehicle(ped, false) and not IsThisModelABicycle(GetEntityModel(GetVehiclePedIsIn(ped, false))) and not isElectric(GetVehiclePedIsIn(ped, false)) then
                 if exports[Config.FuelScript]:GetFuel(GetVehiclePedIsIn(ped, false)) <= 20 then -- At 20% Fuel Left
@@ -986,7 +994,7 @@ end)
 
 CreateThread(function() -- Speeding
     while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             local ped = PlayerPedId()
             if IsPedInAnyVehicle(ped, false) then
                 local speed = GetEntitySpeed(GetVehiclePedIsIn(ped, false)) * speedMultiplier
@@ -1013,7 +1021,7 @@ end
 
 CreateThread(function() -- Shooting
     while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             local ped = PlayerPedId()
             local weapon = GetSelectedPedWeapon(ped)
             if weapon ~= `WEAPON_UNARMED` then
@@ -1056,7 +1064,7 @@ end
 
 CreateThread(function()
     while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             local ped = PlayerPedId()
             local effectInterval = GetEffectInterval(stress)
             if stress >= 100 then
@@ -1175,7 +1183,7 @@ CreateThread(function()
     local lastIsOutCompassCheck = Menu.isOutCompassChecked
     local lastInVehicle = false
 	while true do
-        if LocalPlayer.state.isLoggedIn then
+        if IsPlayerLoggedIn() then
             Wait(400)
             local show = true
             local player = PlayerPedId()
